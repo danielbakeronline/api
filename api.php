@@ -4,9 +4,9 @@ require_once('class.php');
 
 header("Content-Type:application/json");
 
+$products = new Products;
 
-
-// Makes sure that it is a POST request
+ // Makes sure that it is a POST request
 
 if(strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') != 0){
     throw new Exception('The request method has to be POST!');
@@ -33,58 +33,16 @@ if(!is_array($decoded)){
     throw new Exception('Received content contained invalid JSON!');
 } 
 
+// If the request is missing keys, then it is invalid
 
-
-$categories = new Categories;
-
-$qty_counter = 0;
-$counter = 0;
-$total_price = 0;
-$sandwich_counter = 1;
-$snack_counter = 1;
-$drink_counter = 1;
-
-/*
-
-// Just added for testing - START
-
-$decoded = Array(
-
-    'products' => Array(
-    "0" => Array
-        (
-            'product_id' => 0,
-            'qty' => 2
-        ),    
-    "1" => Array
-        (
-            'product_id' => 3,
-            'qty' => 2  
-        ),    
-    "2" => Array
-        (
-            'product_id' => 8,
-            'qty' => 1    
-        ),
-
-    "3" => Array
-        (
-            'product_id' => 2,
-            'qty' => 6    
-        )
-    )
-);
-
-*/
-
-// Just added for testing - END
-
+if (!isset($decoded['products'][0]['product_id']) || (!isset($decoded['products'][0]['qty'])))  {
+    throw new Exception('The JSON file is missing the correct keys');
+}
 
 
 // Gets all of the product information
 
-$json_source_file = file_get_contents("products.json");
-$json_source_array = json_decode($json_source_file,true);
+$products->get_all_product_information();
 
 // Gets the product ids and quanities from the request
 
@@ -93,78 +51,32 @@ $all_qtys = array_column($decoded['products'], 'qty');
 
 // Creates an array of each individual product requested
 
-foreach(array_combine($all_product_ids, $all_qtys) as $value => $tally){
-    
-    $key_location = array_search($value, array_column($json_source_array['products'], 'id'));
-    
-    // Add multiple entries when there are multiples of a product
-
-    while ($qty_counter < $tally) {
-        $category_price[$counter]['category'] = $json_source_array['products'][$key_location]['category'];
-        $category_price[$counter]['price'] = $json_source_array['products'][$key_location]['price'];
-        
-        $qty_counter += 1;
-        $counter += 1;
-    } 
-    
-    $qty_counter = 0;
-}
+$products->create_individual_product_list($all_product_ids, $all_qtys);
 
 // Sorts all of the the products in descending price order. This means that the customer will
 // get the best deal and  the grand total will be the same independent of the order that it
 // has been added to the shopping basket
 
-usort($category_price, 'order_by_price');
+usort($products->category_price, 'order_by_price');
 
 function order_by_price($a, $b) {
     return $b['price'] > $a['price'] ? 1 : -1;
-}   
+}    
 
 // Identifies the amount of meal deals
 
-$sandwich_count = $categories->find_category_amount($category_price, 'category', 'sandwich');
-$drink_count = $categories->find_category_amount($category_price, 'category', 'drink');
-$snack_count = $categories->find_category_amount($category_price, 'category', 'snack');
-$meal_deal_count = min($sandwich_count, $drink_count, $snack_count);
+$products->calculate_meal_deals_quantity();
 
 // Groups the non-meal deal products together
 
-foreach($category_price as $category_prices) {
-    if($category_prices['category'] == 'sandwich' AND $sandwich_counter <= $meal_deal_count) {
-        $sandwich_counter += 1;
-    }
-    elseif($category_prices['category'] == 'snack' AND $snack_counter <= $meal_deal_count){
-        $snack_counter += 1;
-    }
-    elseif($category_prices['category'] == 'drink' AND $drink_counter <= $meal_deal_count){
-        $drink_counter += 1;
-    }
-    else {
-        $remaining_category_price[$qty_counter] = $category_prices;
-        $qty_counter += 1;
-    }
-}
-
-$individual_products_total = 0;
+$products->remove_meal_deals();
 
 // Calculates the total price of non-meal deal products
 
-foreach($remaining_category_price as $remaing_category_prices){
-    $individual_products_total += $remaing_category_prices['price'];
-}
+$products->individual_products_total();
 
-// Calculates the final total
+// Sends off the the final total
 
-$total_price = $individual_products_total + ($meal_deal_count * 3);
-
-$total = floatval(number_format($total_price, 2,'.',''));
-
-// Formats the final total into json and sends it off
-
-$total_array = Array (
-    'total' => $total,
-);
-
-echo json_encode($total_array);
+echo json_encode($products->calculate_grand_total());
 
 ?>

@@ -1,0 +1,52 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Chicken Breast Fillets (4 pk.)",
+      "price": 3.50,
+      "category": "meat"
+    },
+    {
+      "id": 2,
+      "name": "Egg and Cress Sandwich",
+      "price": 1.80,
+      "category": "sandwich"
+    },
+    {
+      "id": 3,
+      "name": "Bottled Water",
+      "price": 1.20,
+      "category": "drink"
+    },
+    {
+      "id": 4,
+      "name": "Ready Salted Crisps",
+      "price": 0.80,
+      "category": "snack"
+    },
+    {
+      "id": 5,
+      "name": "Canned Tomatoes",
+      "price": 0.32,
+      "category": "tins"
+    },
+    {
+      "id": 6,
+      "name": "Cherry Yoghurt",
+      "price": 3.50,
+      "category": "dairy"
+    },
+    {
+      "id": 7,
+      "name": "Chocolate Bar",
+      "price": 0.75,
+      "category": "snack"
+    },
+    {
+      "id": 8,
+      "name": "BLT",
+      "price": 2.30,
+      "category": "sandwich"
+    }
+  ]
+}

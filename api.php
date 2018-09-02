@@ -4,7 +4,7 @@ require_once('class.php');
 
 header("Content-Type:application/json");
 
-/*
+
 
 // Makes sure that it is a POST request
 
@@ -33,7 +33,7 @@ if(!is_array($decoded)){
     throw new Exception('Received content contained invalid JSON!');
 } 
 
-*/
+
 
 $categories = new Categories;
 
@@ -43,6 +43,8 @@ $total_price = 0;
 $sandwich_counter = 1;
 $snack_counter = 1;
 $drink_counter = 1;
+
+/*
 
 // Just added for testing - START
 
@@ -72,6 +74,8 @@ $decoded = Array(
         )
     )
 );
+
+*/
 
 // Just added for testing - END
 

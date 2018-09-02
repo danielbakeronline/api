@@ -1,0 +1,16 @@
+{
+  "products": [
+    {
+      "product_id": 1,
+      "qty": 1
+    },
+    {
+      "product_id": 2,
+      "qty": 1
+    },
+    {
+      "product_id": 3,
+      "qty": 1
+    }
+  ]
+}
